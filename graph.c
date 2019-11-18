@@ -59,14 +59,11 @@ int main(int argc, char **argv){
 
     struct CSRgraph graph;
 
-    int destination_offsets_h[] = {0, 1, 3, 4, 6, 8, 10};
-    int source_indices_h[] = {2, 0, 2, 0, 4, 5, 2, 3, 3, 4};
-
-    int nv = 7;
-    int nvz = 10;
-
-    graph.nvertices = nv+1;
-    graph.nedges = nvz+1;
+    int destination_offsets[] = {0, 1, 3, 4, 6, 8, 10};
+    int source_indices[] = {2, 0, 2, 0, 4, 5, 2, 3, 3, 4};
+    int nv = 7, nvz = 10; 
+    
+    setGraph(graph, destination_offsets, source_indices, nv, nvz);
 
   }
 
