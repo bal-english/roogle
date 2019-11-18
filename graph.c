@@ -63,7 +63,8 @@ int main(int argc, char **argv){
     int source_indices[] = {2, 0, 2, 0, 4, 5, 2, 3, 3, 4};
     int nv = 7, nvz = 10; 
     
-    setGraph(graph, destination_offsets, source_indices, nv, nvz);
+    setgraph(graph, destination_offsets, source_indices, nv, nvz);
+    freegraph(graph);
 
   }
 
