@@ -25,6 +25,15 @@ void setgraph(struct CSRgraph g,
   g.nedges = ne+1;
   g.dest_offsets = malloc(g.nvertices*sizeof(int));
   g.source_indices = malloc(g.nedges*sizeof(int));
+  
+  int i;
+  for(i = 0; i < nv+1; i++){
+    g.dest_offsets[i] = dest_offsets[i];
+  }
+  
+  for(i = 0; i < ne+1; i++){
+    g.source_indices[i] = source_indices[i];
+  }
 
 }
 
