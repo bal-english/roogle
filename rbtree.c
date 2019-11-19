@@ -8,16 +8,16 @@
 #ifndef RBNODE
 #define RBNODE
 
-struct Node {
+struct RBNode {
   bool is_red;
   char* data;
-  struct Node* parent, * left, * right;
+  struct RBNode* parent, * left, * right;
 };
 
-static struct Node nilvar = {false, "null", NULL, NULL, NULL};
-static struct Node* const NIL = &nilvar;
+static struct RBNode nilvar = {false, "null", NULL, NULL, NULL};
+static struct RBNode* const NIL = &nilvar;
 
-void init_node(struct Node* n, bool iR) {
+void init_RBNode(struct RBNode* n, bool iR) {
   n->is_red = iR;
   n->parent = NIL;
   n->left = NIL;
@@ -25,26 +25,26 @@ void init_node(struct Node* n, bool iR) {
   n->data = ".";
 }
 
-void create_node(struct Node* n, char* str, bool iR) {
-  init_node(n, iR);
+void create_RBNode(struct RBNode* n, char* str, bool iR) {
+  init_RBNode(n, iR);
   n->data = str;
 }
 
-void create_node_def(struct Node* n, char* str) {
-  create_node(n, str, false);
+void create_RBNode_def(struct RBNode* n, char* str) {
+  create_RBNode(n, str, false);
 }
 
-int nodecmp(struct Node* n1, struct Node* n2) {
+int RBNodecmp(struct RBNode* n1, struct RBNode* n2) {
   return strcmp(n1->data, n2->data);
 }
 
-bool append_left(struct Node* p, struct Node* l) {
+bool append_left(struct RBNode* p, struct RBNode* l) {
   bool noerr = true;
   if(p->left != NIL && p->left->parent != NIL) {
     //#warning Left child of parent was orphaned on left insertion
     noerr = false;
   } else if(l->parent != NIL && l->parent->left != NIL) {
-    //#warning Parent of left node was left pointing to left node on left insertion
+    //#warning Parent of left RBNode was left pointing to left RBNode on left insertion
     noerr = false;
   }
   p->left = l;
@@ -52,13 +52,13 @@ bool append_left(struct Node* p, struct Node* l) {
   return noerr;
 }
 
-bool append_right(struct Node* p, struct Node* r) {
+bool append_right(struct RBNode* p, struct RBNode* r) {
   bool noerr = true;
   if(p->right != NIL && p->right->parent != NIL) {
     //#warning Right child of parent was orphaned on right insertion
     noerr = false;
   } else if(r->parent != NIL && r->parent->right != NIL) {
-    //#warning Parent of right node was right pointing to right node on right insertion
+    //#warning Parent of right RBNode was right pointing to right RBNode on right insertion
     noerr = false;
   }
   p->right = r;
@@ -71,7 +71,7 @@ void print_spaces(int i) {
     printf("    ");
   }
 }
-void print_subtree_colors_recursive(struct Node* n, int level) {
+void print_subtree_colors_recursive(struct RBNode* n, int level) {
   if(n == NIL)
     return;
   print_subtree_colors_recursive(n->right, level+1);
@@ -84,7 +84,7 @@ void print_subtree_colors_recursive(struct Node* n, int level) {
   print_subtree_colors_recursive(n->left, level+1);
 
 }
-void print_subtree_colors(struct Node* n) {
+void print_subtree_colors(struct RBNode* n) {
   if(n == NIL) {
     puts("Empty Sub Tree.");
     return;
@@ -94,7 +94,7 @@ void print_subtree_colors(struct Node* n) {
 #endif
 
 struct RBTree {
-  struct Node* root;
+  struct RBNode* root;
   int size, longest_word;
 };
 
@@ -154,51 +154,51 @@ void print_tree_debug(struct RBTree* tree) {
     puts("E");
 }
 void init_tree(struct RBTree* tree) {
-  tree->root = malloc(sizeof(struct Node));
+  tree->root = malloc(sizeof(struct RBNode));
   tree->size = 0;
   tree->longest_word = -1;
 }
 void create_tree(struct RBTree* tree, char* str) {
   init_tree(tree);
-  create_node_def(tree->root, str);
+  create_RBNode_def(tree->root, str);
   tree->size++;
   tree->longest_word = strlen(str);
 }
 
-/*void rotatel(struct RBTree* tree, struct Node* node) {
-  struct Node* nr = node->right;
-  node->right = node->right->left;
-  if(node->right != NIL) {
-    node->right->parent = node;
+/*void rotatel(struct RBTree* tree, struct RBNode* RBNode) {
+  struct RBNode* nr = RBNode->right;
+  RBNode->right = RBNode->right->left;
+  if(RBNode->right != NIL) {
+    RBNode->right->parent = RBNode;
   }
-  nr->parent = node->parent;
-  if(node->parent == NIL)
+  nr->parent = RBNode->parent;
+  if(RBNode->parent == NIL)
     tree->root = nr;
-  else if(node == node->parent->left)
-    node->parent->left = nr;
+  else if(RBNode == RBNode->parent->left)
+    RBNode->parent->left = nr;
   else
-    node->parent->right = nr;
+    RBNode->parent->right = nr;
 
-  nr->left = node;
-  node->parent = nr;
+  nr->left = RBNode;
+  RBNode->parent = nr;
 }
-void rotater(struct RBTree* tree, struct Node* node) {
-  struct Node* nl = node->left;
-  if(node->left != NIL)
-    node->left->parent = node;
-  nl->parent = node->parent;
-  if(node->parent == NIL)
+void rotater(struct RBTree* tree, struct RBNode* RBNode) {
+  struct RBNode* nl = RBNode->left;
+  if(RBNode->left != NIL)
+    RBNode->left->parent = RBNode;
+  nl->parent = RBNode->parent;
+  if(RBNode->parent == NIL)
     tree->root = nl;
-  else if(node == node->parent->right)
-    node->parent->right = nl;
+  else if(RBNode == RBNode->parent->right)
+    RBNode->parent->right = nl;
   else
-    node->parent->left = nl;
+    RBNode->parent->left = nl;
 
-  nl->right = node;
-  node->parent = nl;
+  nl->right = RBNode;
+  RBNode->parent = nl;
 }*/
-void newrotater(struct RBTree* tree, struct Node* n) {
-  struct Node* nl = n->left;
+void newrotater(struct RBTree* tree, struct RBNode* n) {
+  struct RBNode* nl = n->left;
 
   nl->parent = n->parent;
   if(n->parent == NIL)
@@ -208,15 +208,15 @@ void newrotater(struct RBTree* tree, struct Node* n) {
   else
     n->parent->left = nl;
 
-  struct Node* migrant = nl->right;
+  struct RBNode* migrant = nl->right;
 
   n->left = migrant;
   migrant->parent = n;
   nl->right = n;
 
 }
-void newrotatel(struct RBTree* tree, struct Node* n) {
-  struct Node* nr = n->right;
+void newrotatel(struct RBTree* tree, struct RBNode* n) {
+  struct RBNode* nr = n->right;
 
   nr->parent = n->parent;
   if(n->parent == NIL)
@@ -226,17 +226,17 @@ void newrotatel(struct RBTree* tree, struct Node* n) {
   else
     n->parent->right = nr;
 
-  struct Node* migrant = nr->left;
+  struct RBNode* migrant = nr->left;
 
   n->right = migrant;
   migrant->parent = n;
   nr->left = n;
 }
-void color_fix(struct RBTree* tree, struct Node* node) {
-  struct Node* n = node;
+void color_fix(struct RBTree* tree, struct RBNode* RBNode) {
+  struct RBNode* n = RBNode;
   while(n->parent->is_red) {
     if(n->parent == n->parent->parent->left) {
-      struct Node* uncle = n->parent->parent->right;
+      struct RBNode* uncle = n->parent->parent->right;
       if(uncle->is_red) {
         n->parent->is_red = false;
         uncle->is_red = false;
@@ -252,14 +252,14 @@ void color_fix(struct RBTree* tree, struct Node* node) {
         newrotater(tree, n->parent->parent);
       }
     } else {
-      struct Node* uncle = n->parent->parent->left;
+      struct RBNode* uncle = n->parent->parent->left;
       if(uncle->is_red) {
         n->parent->is_red = false;
         uncle->is_red = false;
         n->parent->parent->is_red = true;
         n = n->parent->parent;
       } else {
-        if(node == node->parent->left) {
+        if(RBNode == RBNode->parent->left) {
           n = n->parent;
           newrotater(tree, n);
         }
@@ -276,13 +276,13 @@ void insert(struct RBTree* tree, char* str) {
     create_tree(tree, str);
     return;
   }
-  struct Node* newptr = malloc(sizeof(struct Node));
-  create_node_def(newptr, str);
-  struct Node* current = tree->root;
+  struct RBNode* newptr = malloc(sizeof(struct RBNode));
+  create_RBNode_def(newptr, str);
+  struct RBNode* current = tree->root;
 
   bool loop = current != NIL;
   while(loop) {
-    if(nodecmp(current, newptr) < 0) {
+    if(RBNodecmp(current, newptr) < 0) {
       if(current->left == NIL) {
         append_left(current, newptr);
         loop = false;
