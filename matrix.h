@@ -1,24 +1,24 @@
 
-#define INDEX(r,c,i,j) i*r + j
+#define INDEX(n,i,j) i*n + j
 
-void initMatrix(float a[], int r, int c){
+void initMatrix(float a[], int n){
 
   int i, j;
-  for(i = 0; i < r; i++){
-    for(j = 0; j < c; j++){
-      int index = INDEX(r, c, i, j);
+  for(i = 0; i < n; i++){
+    for(j = 0; j < n; j++){
+      int index = INDEX(n, i, j);
       a[index] = rand() % 100 + 1;
     }
   }
 }
 
-void printMatrix(float a[], int r, int c){
+void printMatrix(float a[], int n){
 
   printf("\n");
   int i, j;
-  for(i = 0; i < r; i++){
-    for(j = 0; j < c; j++){
-      int index = INDEX(r,c, i, j);
+  for(i = 0; i < n; i++){
+    for(j = 0; j < n; j++){
+      int index = INDEX(n, i, j);
       //printf("Index %d\n", index);
       printf("%.2f\t", a[index]);
     }
