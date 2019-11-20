@@ -4,11 +4,7 @@
 #include <mpi.h>
 #include <math.h>
 
-#include "csr.h" //matrix lib included in csr lib
-
-//inspiration for Compressed Sparse Row encoding from
-//NVIDIA CUDA nvGRAPH library
-//https://docs.nvidia.com/cuda/nvgraph/index.html
+#include "csr.h"
 
 int main(int argc, char **argv){
 
@@ -19,15 +15,31 @@ int main(int argc, char **argv){
 
   if(rank == 0){
 
+    int nsize = 16;
+
+    int matr[nsize*nsize];
+
+    initMatrix(matr, nsize);
+    printMatrix(matr, nsize);
+
+    struct CSRgraph graph1 = matrixtocsr(matr, nsize);
+
+    statprint(graph1);
+    //offsetprint(graph1);
+    //debugprint(graph1);
+
+    freegraph(&graph1);
+
+    /*
     struct CSRgraph graph;
 
     int destination_offsets[] = {0, 1, 3, 4, 6, 8, 10};
     int source_indices[] = {2, 0, 2, 0, 4, 5, 2, 3, 3, 4};
-    int nv = 7, nvz = 10;
-
+    int nv = 6, nvz = 9;
     setgraph(&graph, destination_offsets, source_indices, nv, nvz);
     debugprint(graph);
     freegraph(&graph);
+    */
 
   }
 
