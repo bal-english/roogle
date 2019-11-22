@@ -78,9 +78,7 @@ void statprint(struct CSRgraph g){
 //convert an adjacency matrix to
 //compressed sparse row
 
-struct CSRgraph matrixtocsr(int matrix[], int n){
-
-  struct CSRgraph graph;
+void matrixtocsr(int matrix[], int n, struct CSRgraph *graph){
 
   int dest_offsets[n+1];
   int source_indices[(n * n)+1]; //max edges is n*n
@@ -103,8 +101,6 @@ struct CSRgraph matrixtocsr(int matrix[], int n){
 
   dest_offsets[i] = ne;
 
-  setgraph(&graph, dest_offsets, source_indices, nv, ne);
-
-  return graph;
+  setgraph(graph, dest_offsets, source_indices, nv, ne);
 
 }

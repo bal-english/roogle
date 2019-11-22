@@ -15,16 +15,19 @@ int main(int argc, char **argv){
 
   if(rank == 0){
 
-    int nsize = 16;
+    int nsize = 60;
 
     int matr[nsize*nsize];
 
     initMatrix(matr, nsize);
-    printMatrix(matr, nsize);
+    //printMatrix(matr, nsize);
 
-    struct CSRgraph graph1 = matrixtocsr(matr, nsize);
+    struct CSRgraph graph1;
 
-    statprint(graph1);
+    matrixtocsr(matr, nsize, &graph1);
+
+
+    //statprint(graph1);
     //offsetprint(graph1);
     //debugprint(graph1);
 
