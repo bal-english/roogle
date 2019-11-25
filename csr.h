@@ -24,15 +24,15 @@ void setgraph(struct CSRgraph *g,
 
   g->nvertices = nv;
   g->nedges = ne;
-  g->dest_offsets = malloc(g->nvertices*sizeof(int));
-  g->source_indices = malloc(g->nedges*sizeof(int));
+  g->dest_offsets = malloc((g->nvertices+1)*sizeof(int));
+  g->source_indices = malloc((g->nedges+1)*sizeof(int));
 
   int i;
   for(i = 0; i < nv+1; i++){
     g->dest_offsets[i] = dest_offsets[i];
   }
 
-  for(i = 0; i < ne+1; i++){
+  for(i = 0; i < ne; i++){
     g->source_indices[i] = source_indices[i];
   }
 
@@ -55,6 +55,22 @@ void debugprint(struct CSRgraph g){
   }
 }
 
+void finalconnprint(struct CSRgraph g){
+
+  //print final connection for csr encoded graph
+  //for debugging
+
+  int i, j;
+  int nv = g.nvertices, ne = g.nedges;
+
+  int lowerBound = g.dest_offsets[nv-1];
+  int upperBound = g.dest_offsets[nv];
+  printf("\n\n%d, %d\n", nv, lowerBound);
+  for(j = lowerBound; j < upperBound; j++){
+    printf("vertex %d (%d) --> %d\n", nv, g.dest_offsets[nv], g.source_indices[j]);
+  }
+}
+
 void offsetprint(struct CSRgraph g){
 
   int i, j;
@@ -62,16 +78,14 @@ void offsetprint(struct CSRgraph g){
     printf("%d, ", g.dest_offsets[i]);
   }
   printf("\n\n");
-  for(i = 0; i < g.nedges+1; i++){
-    printf("(%d, %d)\n", i, g.source_indices[i]);
+  for(i = 0; i < g.nedges; i++){
+    printf("%d, ", g.source_indices[i]);
   }
   printf("\n");
 }
 
 void statprint(struct CSRgraph g){
-
   printf("graph stats) v: %d e: %d\n", g.nvertices, g.nedges);
-
 }
 
 
@@ -85,21 +99,20 @@ void matrixtocsr(int matrix[], int n, struct CSRgraph *graph){
   int nv = n, ne = 0;
 
   int i, j;
+  dest_offsets[0] = 0;
   for(i = 0; i < n; i++){
-    dest_offsets[i] = ne;
-    for(j = 0; j < n; j++){
 
+    for(j = 0; j < n; j++){
       int index = INDEX(n,i,j);
       if(matrix[index] != 0){
-        source_indices[ne] = matrix[index];
+        source_indices[ne] = j; //hold index of which connected node
         ne++;
       }
     }
+
+    dest_offsets[i+1] = ne;
+
   }
-
-  ne--;
-
-  dest_offsets[i] = ne;
 
   setgraph(graph, dest_offsets, source_indices, nv, ne);
 

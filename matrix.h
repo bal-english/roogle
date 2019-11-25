@@ -9,7 +9,7 @@ void initMatrix(int a[], int n){
   for(i = 0; i < n; i++){
     for(j = 0; j < n; j++){
       int index = INDEX(n, i, j);
-      a[index] = rand() % n;
+      a[index] = (rand() % 2);
     }
   }
 }
