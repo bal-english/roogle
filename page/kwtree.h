@@ -193,20 +193,20 @@ void KWTree_rotater(struct KWTree* tree, struct KWNode* n) {
 
 }
 void KWTree_rotatel(struct KWTree* tree, struct KWNode* n) {
-  struct KWNode* nr = n->right; //nr = aba
+  struct KWNode* nr = n->right;
 
-  nr->parent = n->parent; //aba->parent = KWNIL
-  if(n->parent == KWNIL) //true
-    tree->root = nr;  //root = aba
+  nr->parent = n->parent;
+  if(n->parent == KWNIL)
+    tree->root = nr;
   else if(n == n->parent->left)
     n->parent->left = nr;
   else
     n->parent->right = nr;
 
-  struct KWNode* migrant = nr->left; // migrant = aaa
-  printf("%d\n", (bool)(migrant == KWNIL));
-  n->right = migrant; //aaa->right = aaa
-  printf("node7: %s %s\n", migrant->data, n->right->data);
+  struct KWNode* migrant = nr->left;
+  //printf("%d\n", (bool)(migrant == KWNIL));
+  n->right = migrant;
+  //printf("node7: %s %s\n", migrant->data, n->right->data);
   if(migrant != KWNIL) {
     migrant->parent = n;
   }
@@ -215,13 +215,13 @@ void KWTree_rotatel(struct KWTree* tree, struct KWNode* n) {
 }
 void KWTree_color_fix(struct KWTree* tree, struct KWNode* node) {
   struct KWNode* n = node;
-  puts("++++++++++++");
-  printf("node: %s\n", node->data);
-  printf("node parent: %s\n", node->parent->data);
-  printf("node parent parent: %s\n", node->parent->parent->data);
-  //printf("node parent parent left: %s\n", node->parent->parent->left->data);
-  print_KWTree(tree);
-  puts("------------");
+  // puts("++++++++++++");
+  // printf("node: %s\n", node->data);
+  // printf("node parent: %s\n", node->parent->data);
+  // printf("node parent parent: %s\n", node->parent->parent->data);
+  // //printf("node parent parent left: %s\n", node->parent->parent->left->data);
+  // print_KWTree(tree);
+  // puts("------------");
   while(n->parent->is_red) {
     if(n->parent == n->parent->parent->left) {
       struct KWNode* uncle = n->parent->parent->right;
@@ -251,17 +251,17 @@ void KWTree_color_fix(struct KWTree* tree, struct KWNode* node) {
           n = n->parent;
           KWTree_rotater(tree, n);
         }
-        puts("t1:");
-        print_KWTree(tree);
+        // puts("t1:");
+        // print_KWTree(tree);
         n->parent->is_red = false;
         n->parent->parent->is_red = true;
         KWTree_rotatel(tree, n->parent->parent);
-        puts("t2:");
-        print_KWTree(tree);
-        printf("node: %s\n", n->data);
-        printf("node parent: %s\n", n->parent->data);
-        printf("node parent left: %s\n", n->parent->left->data);
-        printf("node parent left parent: %s\n", n->parent->left->parent->data);
+        // puts("t2:");
+        // print_KWTree(tree);
+        // printf("node: %s\n", n->data);
+        // printf("node parent: %s\n", n->parent->data);
+        // printf("node parent left: %s\n", n->parent->left->data);
+        // printf("node parent left parent: %s\n", n->parent->left->parent->data);
       }
     }
   }

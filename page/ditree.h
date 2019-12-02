@@ -252,7 +252,7 @@ void DITree_insert_di(struct DITree* tree, DocIndex* di) {
 
   bool loop = current != DINIL;
   while(loop) {
-    int cmp = DINodecmp(current, newptr);
+    int cmp = DINodecmp(newptr, current);
     if(cmp < 0) {
       if(current->left == DINIL) {
         DINode_append_left(current, newptr);
