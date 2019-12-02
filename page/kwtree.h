@@ -311,5 +311,40 @@ struct KWNode* KWTree_insert(struct KWTree* tree, char* keyword, int index) {
   appendtolist(kw_ptr->list, index);
   return kw_ptr;
 }
+void KWTree_fetch_idList(struct KWTree* tree, char* query, struct idList** buffer) {
+  //assert(tree->root != KWNIL);
+  struct KWNode* current = KWNIL;
+  struct KWNode* next = tree->root;
+  do {
+    current = next;
+    int cmp = strcmp(query, current->data);
+    if(cmp == 0) {
+      *buffer = (current->list);
+      return;
+    } else if(cmp < 0) {
+      next = next->left;
+    } else
+      next = next->right;
+  } while(next != KWNIL);
+  if(debug) {
+    printf("Query: \"%s\" not found in KWTree.", query);
+  }
+}
+
+// struct KWTree kwt;
+// create_KWTree(&kwt, "testword");
+// print_KWTree(&kwt);
+// KWTree_insert_kw(&kwt, "abcde");
+// print_KWTree(&kwt);
+//
+// struct idList list;
+// struct idList* buf = &list;
+// KWTree_fetch_idList(&kwt, "testword", &buf);
+// printlist(buf);
+//
+// KWTree_insert(&kwt, "aba", 4);
+// KWTree_insert(&kwt, "aba", 2);
+// KWTree_fetch_idList(&kwt, "aba", &buf);
+// printlist(buf);
 
 #endif

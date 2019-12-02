@@ -184,7 +184,7 @@ void DITree_rotater(struct DITree* tree, struct DINode* n) {
     migrant->parent = n;
   }
   nl->right = n;
-  n->parent = nr;
+  n->parent = nl;
 }
 void DITree_rotatel(struct DITree* tree, struct DINode* n) {
   struct DINode* nr = n->right;
