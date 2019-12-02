@@ -152,9 +152,18 @@ void splitstr(char *str, char **strarr, char *delims){
   }
 }
 
+//convert all chars in string to lower case
+void lowerall(char *str){
+  int i;
+  for(i = 0; i < strlen(str); i++){
+    str[i] = tolower(str[i]);
+  }
+}
+
 void cleanstrings(char **strarr, char *badchars, int strs){
   int i, j;
   for(i = 0; i < strs; i++){
+    lowerall(strarr[i]); //first put entire string to lowercase
     for(j = 0; j < strlen(strarr[i]); j++){
       //printf("%c ", strarr[i][j]);
       if(comparetodelims(strarr[i][j], badchars)){
@@ -178,4 +187,42 @@ int getstrarrsize(char **strarr){
     index++;
   }
   return index;
+}
+
+//insert entire abstract into tree
+void insertAbstract(struct KWTree *tree, char *abstract, int index){
+
+  //just some standard stuff, will be dealloced after this
+  int wordsperabstract = 150;
+  int maxwordsize = 25;
+
+  int i;
+  char **strarr = malloc(sizeof(char*) * wordsperabstract);
+  for(i = 0; i < wordsperabstract; i++){
+    strarr[i] = malloc(sizeof(char)*maxwordsize);
+  }
+
+  splitstr(abstract, strarr, " \0");
+  int newsize = getstrarrsize(strarr);
+  //get rid of any special chars
+  cleanstrings(strarr, ",./", newsize);
+
+  for(i = 0; i < newsize; i++){
+    //printf("adding word %s\n", strarr[i]);
+    KWTree_insert(tree, strarr[i], index);
+  }
+  //printf("inserted all words\n");
+
+}
+
+int getKeywordDocs(struct KWTree *tree, char *keyword, int docIndices[]){
+
+  struct idList list;
+  struct idList* res = &list;
+
+  KWTree_fetch_idList(tree, keyword, &res);
+
+  if(res == NULL) return 0;
+  return convertToArr(res, docIndices);
+
 }

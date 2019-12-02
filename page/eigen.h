@@ -149,10 +149,55 @@ void matrixeigen(int matrix[], float res[], int n){
 
 }
 
-void CSReigen(struct CSRgraph csr, int *res, int n){
-/*
-  float vector[n];
+//sparse matrix multiplication
+void sparsemult(struct CSRgraph csr, int vect[], int res[], int n){
 
+  int i, j;
+  for(i = 0; i < n; ++i){
+    res[i] = 0;
+    for(j = csr.dest_offsets[i]; j < csr.dest_offsets[i+1]; ++j){
+      res[i] += 1 * vect[csr.source_indices[j]];
+    }
+  }
+}
+
+//sparse matrix mult with float arrs instead (for pagerank)
+void sparsemult_f(struct CSRgraph csr, float vect[], float res[], int n){
+
+  int i, j;
+  for(i = 0; i < n; ++i){
+    res[i] = 0;
+    for(j = csr.dest_offsets[i]; j < csr.dest_offsets[i+1]; ++j){
+      res[i] += 1 * vect[csr.source_indices[j]];
+    }
+  }
+}
+
+
+//do this part
+//like this whole function
+void sparsetranspose(struct CSRgraph *csr){
+
+}
+
+void sparsehit(struct CSRgraph csr, int auth[], int hub[], int n){
+
+  //init vector of all 1's
+  int vector[n];
+  int i;
+
+  for(i = 0; i < n; i++){
+    vector[i] = 1;
+  }
+
+  sparsemult(csr, vector, hub, n); //get hub score
+
+}
+
+
+void CSReigen(struct CSRgraph csr, float res[], int n){
+
+  float vector[n];
   int i;
 
   //init vectors
@@ -163,7 +208,7 @@ void CSReigen(struct CSRgraph csr, int *res, int n){
 
   while(1){
 
-    matrvct(matrix, vector, res, n);
+    sparsemult_f(csr, vector, res, n);
 
     float eigenValue = findmax(res, n);
     for(i = 0; i < n; i++){
@@ -179,7 +224,7 @@ void CSReigen(struct CSRgraph csr, int *res, int n){
     }
 
   }
-*/
+
 }
 
 void hits(int matrix[], int auth[], int hub[], int n){
