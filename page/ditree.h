@@ -179,11 +179,12 @@ void DITree_rotater(struct DITree* tree, struct DINode* n) {
     n->parent->left = nl;
 
   struct DINode* migrant = nl->right;
-
   n->left = migrant;
-  migrant->parent = n;
+  if(migrant != DINIL) {
+    migrant->parent = n;
+  }
   nl->right = n;
-
+  n->parent = nr;
 }
 void DITree_rotatel(struct DITree* tree, struct DINode* n) {
   struct DINode* nr = n->right;
@@ -197,10 +198,12 @@ void DITree_rotatel(struct DITree* tree, struct DINode* n) {
     n->parent->right = nr;
 
   struct DINode* migrant = nr->left;
-
   n->right = migrant;
-  migrant->parent = n;
+  if(migrant != DINIL) {
+    migrant->parent = n;
+  }
   nr->left = n;
+  n->parent = nr;
 }
 void DITree_color_fix(struct DITree* tree, struct DINode* DINode) {
   struct DINode* n = DINode;

@@ -10,8 +10,9 @@ struct idList {
 };
 
 void initlist(struct idList *list){
-  list = (struct idList*)malloc(sizeof (struct idList));
+  //list = (struct idList*)malloc(sizeof (struct idList));
   list->first = NULL;
+  list->last = NULL;
 }
 
 void appendtolist(struct idList *list, int index){

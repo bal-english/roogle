@@ -28,6 +28,7 @@ void init_KWNode(struct KWNode* n, bool iR) {
   n->left = KWNIL;
   n->right = KWNIL;
   n->data = ".";
+  n->list = malloc(sizeof(struct idList));
   initlist(n->list);
 }
 
