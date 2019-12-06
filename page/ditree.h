@@ -282,6 +282,29 @@ void DITree_insert_di(struct DITree* tree, DocIndex* di) {
   newptr->is_red = true;
   DITree_color_fix(tree, newptr);
 }
+int DITree_get_index(struct DITree*, char* query) {
+  if(tree->root == NIL || tree->size == 0) {
+    return -1;
+  }
+  struct DINode* last = NIL;
+  struct DINode* current = tree->root;
+  bool loop = true;//current != DINIL; || strcmp(current->data->doc_id, query) != 0;
+  while(loop) {
+    int cmp = strcmp(tree->data->doc, query);
+    if(cmp != 0) {
+      last = current;
+      if(cmp < 0) {
+        current = current->left;
+      } else if (cmp > 0) {
+        current = current->right;
+      }
+      loop = current != NIL;
+    } else {
+      return current->data->doc_id;
+    }
+  }
+  return -1;
+}
 DocIndex* DITree_insert(struct DITree* tree, const char* id, const int index) {
   DocIndex* di; create_DocIndex(di, id, index);
   DITree_insert_di(tree, di);
