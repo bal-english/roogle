@@ -176,6 +176,7 @@ void cleanstrings(char **strarr, char *badchars, int strs){
   }
 }
 
+//get number of strings in a char**
 int getstrarrsize(char **strarr){
   char *curr;
   int index = 0;
@@ -189,25 +190,38 @@ int getstrarrsize(char **strarr){
   return index;
 }
 
-//insert entire abstract into tree
-void insertAbstract(struct KWTree *tree, char *abstract, int index){
+int parseAbstract(char *abstract, char **keywords){
 
   //just some standard stuff, will be dealloced after this
   int wordsperabstract = 150;
   int maxwordsize = 25;
 
   int i;
-  char **strarr = malloc(sizeof(char*) * wordsperabstract);
   for(i = 0; i < wordsperabstract; i++){
-    strarr[i] = malloc(sizeof(char)*maxwordsize);
+    keywords[i] = malloc(sizeof(char)*maxwordsize);
   }
 
-  splitstr(abstract, strarr, " \0");
-  int newsize = getstrarrsize(strarr);
+  splitstr(abstract, keywords, " \0");
+  int newsize = getstrarrsize(keywords);
   //get rid of any special chars
-  cleanstrings(strarr, ",./", newsize);
+  cleanstrings(keywords, ",./", newsize);
 
-  for(i = 0; i < newsize; i++){
+  return newsize;
+
+}
+
+//insert entire abstract into tree
+void insertAbstract(struct KWTree *tree, char *abstract, int index){
+
+  //just some standard stuff, will be dealloced after this
+  int wordsperabstract = 150;
+  int maxwordsize = 25;
+  int i;
+
+  char **strarr = malloc(sizeof(char*) * wordsperabstract);
+  int wordcount = parseAbstract(abstract, strarr);
+
+  for(i = 0; i < wordcount; i++){
     //printf("adding word %s\n", strarr[i]);
     KWTree_insert(tree, strarr[i], index);
   }
@@ -215,14 +229,11 @@ void insertAbstract(struct KWTree *tree, char *abstract, int index){
 
 }
 
-int getKeywordDocs(struct KWTree *tree, char *keyword, int docIndices[]){
+void getKeywordDocs(struct KWTree *tree, char *keyword, struct idList *res){
 
-  struct idList list;
-  struct idList* res = &list;
-
-  KWTree_fetch_idList(tree, keyword, &res);
-
-  if(res == NULL) return 0;
-  return convertToArr(res, docIndices);
+  struct idList temp;
+  struct idList *tempPtr = &temp;
+  KWTree_fetch_idList(tree, keyword, &tempPtr);
+  res->first = tempPtr->first;
 
 }

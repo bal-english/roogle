@@ -16,7 +16,20 @@
 #include "ditree.h"
 #include "kwtree.h"
 #include "treeops.h"
+#include "citelist.h"
 #include "sequencereader.h"
+
+/*
+
+some stats we calc'd
+
+size of full list of documents: 87mb
+size of matrix encoding (ints 9.5tb) (bits 211gb)
+size of CSR encoding:
+  offsets (vertices) list: 6.4mb
+  sources (edges) lists: ~300mb
+
+*/
 
 int main(int argc, char **argv){
 
@@ -39,6 +52,16 @@ int main(int argc, char **argv){
   insertAbstract(kwt, str4, 3);
   insertAbstract(kwt, str5, 4);
   insertAbstract(kwt, str6, 5);
+
+
+  char *starall[200];
+  int wordcount = parseAbstract(str, starall);
+
+  int i;
+  for(i = 0; i < wordcount; i++){
+    printf("%s\n", starall[i]);
+  }
+
 
   //print_KWTree(kwt);
 
@@ -69,7 +92,6 @@ int main(int argc, char **argv){
 
 
   int n = 5;
-  int i;
   int matrix[n*n];
 
   initMatrix(matrix, n);
@@ -106,7 +128,7 @@ int main(int argc, char **argv){
 
   printf("\n\n~~~read testing~~~\n\n");
 
-  readfile("sample.txt");
+  //readfile("sample.txt");
 
   /*
   printf("\n...\n");
