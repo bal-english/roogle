@@ -53,6 +53,16 @@ int main(int argc, char **argv){
   insertAbstract(kwt, str5, 4);
   insertAbstract(kwt, str6, 5);
 
+
+  char *starall[200];
+  int wordcount = parseAbstract(str, starall);
+
+  int i;
+  for(i = 0; i < wordcount; i++){
+    printf("%s\n", starall[i]);
+  }
+
+
   //print_KWTree(kwt);
 
   struct idList *res = (struct idList*)malloc(sizeof (struct idList));
@@ -82,7 +92,6 @@ int main(int argc, char **argv){
 
 
   int n = 5;
-  int i;
   int matrix[n*n];
 
   initMatrix(matrix, n);
@@ -119,9 +128,7 @@ int main(int argc, char **argv){
 
   printf("\n\n~~~read testing~~~\n\n");
 
-  readfile("sample.txt");
-
-  struct Citenode *citearray[300];
+  //readfile("sample.txt");
 
   /*
   printf("\n...\n");
