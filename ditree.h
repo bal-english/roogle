@@ -2,7 +2,6 @@
 #define DITREE
 
 #include <stdbool.h>
-#include "document.h"
 #include <string.h>
 #include "debug.h"
 #ifndef DINODE
@@ -67,7 +66,8 @@ bool DINode_append_right(struct DINode* p, struct DINode* r) {
 }
 
 void DI_print_spaces(int i) {
-  for(int a = 0; a < i; a++) {
+  int a;
+  for(a = 0; a < i; a++) {
     printf("    ");
   }
 }
@@ -179,11 +179,12 @@ void DITree_rotater(struct DITree* tree, struct DINode* n) {
     n->parent->left = nl;
 
   struct DINode* migrant = nl->right;
-
   n->left = migrant;
-  migrant->parent = n;
+  if(migrant != DINIL) {
+    migrant->parent = n;
+  }
   nl->right = n;
-
+  n->parent = nl;
 }
 void DITree_rotatel(struct DITree* tree, struct DINode* n) {
   struct DINode* nr = n->right;
@@ -197,10 +198,12 @@ void DITree_rotatel(struct DITree* tree, struct DINode* n) {
     n->parent->right = nr;
 
   struct DINode* migrant = nr->left;
-
   n->right = migrant;
-  migrant->parent = n;
+  if(migrant != DINIL) {
+    migrant->parent = n;
+  }
   nr->left = n;
+  n->parent = nr;
 }
 void DITree_color_fix(struct DITree* tree, struct DINode* DINode) {
   struct DINode* n = DINode;
@@ -279,10 +282,35 @@ void DITree_insert_di(struct DITree* tree, DocIndex* di) {
   newptr->is_red = true;
   DITree_color_fix(tree, newptr);
 }
-DocIndex* DITree_insert(struct DITree* tree, const char* id, const int index) {
-  DocIndex* di; create_DocIndex(di, id, index);
+
+DocIndex* DITree_insert(struct DITree* tree, char* id, int index) {
+  DocIndex* di; create_DocIndex(&di, id, index);
   DITree_insert_di(tree, di);
   return di;
+}
+
+int DITree_get_index(struct DITree *tree, char* query) {
+  if(tree->root == DINIL || tree->size == 0) {
+    return -1;
+  }
+  struct DINode* last = DINIL;
+  struct DINode* current = tree->root;
+  bool loop = true;//current != DINIL; || strcmp(current->data->doc_id, query) != 0;
+  while(loop) {
+    int cmp = strcmp(current->data->doc_id, query);
+    if(cmp != 0) {
+      last = current;
+      if(cmp < 0) {
+        current = current->left;
+      } else if (cmp > 0) {
+        current = current->right;
+      }
+      loop = current != DINIL;
+    } else {
+      return current->data->matrix_index;
+    }
+  }
+  return -1;
 }
 
 #endif

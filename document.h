@@ -56,18 +56,21 @@ void create_document(struct Document* d,
   set_document_values(d, matrixindex, hs, as, pr);
 }
 #endif
+
 #ifndef DOCINDEX
 #define DOCINDEX
+
 typedef struct DocIndex {
-  const char* doc_id;
-  const int matrix_index;
+  char* doc_id;
+  int matrix_index;
 } DocIndex;
 
 void print_DocIndex(const DocIndex* di) {
   printf("%s: %d\n", di->doc_id, di->matrix_index);
 }
-void create_DocIndex(DocIndex* ptr, const char* id, const int index) {
-  DocIndex di = {id, index};
-  ptr = &di;
+void create_DocIndex(DocIndex** ptr, char* id, int index) {
+  *ptr = malloc(sizeof(DocIndex));
+  (*ptr)->matrix_index = index;
+  (*ptr)->doc_id = id;
 }
 #endif
