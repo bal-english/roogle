@@ -16,10 +16,12 @@ int readline(char str[], int fd){
   return -1;
 }
 
+
+
 void printcitelist(char *list[], int numcites){
   int i;
   for(i = 0; i < numcites; i++){
-    
+
     if(i == 0){
        printf("origin: %s\n", list[i]);
        continue;

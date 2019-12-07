@@ -2,6 +2,7 @@
 #define RBTREE
 
 #include <stdbool.h>
+#include "dictlist.h"
 
 #ifndef RBNODE
 #define RBNODE

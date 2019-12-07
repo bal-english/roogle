@@ -84,13 +84,21 @@ void print_subKWTree_colors_recursive(struct KWNode* n, int level) {
   print_subKWTree_colors_recursive(n->right, level+1);
   KW_print_spaces(level);
   if(n->is_red)
-    //printf("R");
-    printf("R:%s", n->data);
+    printf("R");
+    //printf("R:%s", n->data);
   else
-    printf("B:%s", n->data);
-    //printf("B");
+    //printf("B:%s", n->data);
+    printf("B");
   puts("");
   print_subKWTree_colors_recursive(n->left, level+1);
+
+}
+void print_subKWTree_values_recursive(struct KWNode* n, int level) {
+  if(n == KWNIL)
+    return;
+  print_subKWTree_values_recursive(n->right, level+1);
+  printf("%s, ", n->data);
+  print_subKWTree_values_recursive(n->left, level+1);
 
 }
 void print_subKWTree_colors(struct KWNode* n) {
@@ -100,6 +108,13 @@ void print_subKWTree_colors(struct KWNode* n) {
   }
   print_subKWTree_colors_recursive(n, 0);
 }
+void print_subKWTree_values(struct KWNode* n) {
+  if(n == KWNIL) {
+    puts("Empty Sub KWTree.");
+    return;
+  }
+  print_subKWTree_values_recursive(n, 0);
+}
 #endif
 
 struct KWTree {
@@ -107,7 +122,16 @@ struct KWTree {
   int size;
 };
 
-void print_KWTree(struct KWTree* tree) {
+void print_KWTree_elements(struct KWTree* tree) {
+  if(tree->size < 1) {
+    puts("Empty KWTree.");
+    return;
+  }
+  puts("KWTree:");
+  print_subKWTree_values_recursive(tree->root, 0);
+  puts("");
+}
+void print_KWTree_structure(struct KWTree* tree) {
   if(tree->size < 1) {
     puts("Empty KWTree.");
     return;
@@ -171,6 +195,10 @@ void create_KWTree(struct KWTree* tree, char* str) {
   init_KWTree(tree);
   create_KWNode_def(tree->root, str);
   tree->size++;
+}
+void define_KWTree(struct KWTree* tree) {
+  tree->root = KWNIL;
+  tree->size = 0;
 }
 
 void KWTree_rotater(struct KWTree* tree, struct KWNode* n) {
@@ -269,8 +297,10 @@ void KWTree_color_fix(struct KWTree* tree, struct KWNode* node) {
   tree->root->is_red = false;
 }
 struct KWNode* KWTree_insert_kw(struct KWTree* tree, char* str) {
-  if(tree->root == KWNIL) {
+  if(tree->root == NULL || tree->root == KWNIL) {
+    //puts("Creating new...");
     create_KWTree(tree, str);
+    //puts("Creatied.");
     return tree->root;
   }
   struct KWNode* newptr = malloc(sizeof(struct KWNode));
@@ -279,14 +309,17 @@ struct KWNode* KWTree_insert_kw(struct KWTree* tree, char* str) {
 
   bool loop = current != KWNIL;
   while(loop) {
+    //puts("Comparing");
     int cmp = KWNodecmp(newptr, current);
     if(cmp < 0) {
+      //puts("Left");
       if(current->left == KWNIL) {
         KWNode_append_left(current, newptr);
         loop = false;
       } else
         current = current->left;
     } else if(cmp > 0) {
+      //puts("Right");
       if(current->right == KWNIL) {
         KWNode_append_right(current, newptr);
         loop = false;
@@ -301,14 +334,16 @@ struct KWNode* KWTree_insert_kw(struct KWTree* tree, char* str) {
     if(loop)
       loop = current != KWNIL;
   }
+  //puts("Added.");
   tree->size++;
   newptr->is_red = true;
   KWTree_color_fix(tree, newptr);
+  //puts("Colors Fixed.");
   return newptr;
 }
 struct KWNode* KWTree_insert(struct KWTree* tree, char* keyword, int index) {
   struct KWNode* kw_ptr = KWTree_insert_kw(tree, keyword);
-  appendtolist(kw_ptr->list, index);
+  //appendtolist(kw_ptr->list, index);
   return kw_ptr;
 }
 void KWTree_fetch_idList(struct KWTree* tree, char* query, struct idList** buffer) {
@@ -346,5 +381,4 @@ void KWTree_fetch_idList(struct KWTree* tree, char* query, struct idList** buffe
 // KWTree_insert(&kwt, "aba", 2);
 // KWTree_fetch_idList(&kwt, "aba", &buf);
 // printlist(buf);
-
 #endif
