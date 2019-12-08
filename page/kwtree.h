@@ -188,6 +188,44 @@ void print_KWTree_debug(struct KWTree* tree) {
   } else
     puts("E");
 }
+
+/*void KWTree_populate_recursive(char** words, int** indexes, int* index_len, struct KWNode* node, int* cnt) {
+  if(node == KWNIL)
+    return;
+
+  KWTree_populate_recursive(words, indexes, index_len, node->left, cnt);
+  words[*cnt] = node->data;
+  index_len[*cnt] = node->list->size;
+  indexes[*cnt] = malloc(index_len[*cnt]*sizeof(int));
+  convertToArr(node->list, indexes[*cnt]);
+  (*cnt)++;
+  KWTree_populate_recursive(words, indexes, index_len, node->right, cnt);
+}*/
+int KWTree_populate_recursive2(char** words, int** indexes, int* index_len, struct KWNode* node, int cnt) {
+  if(node == KWNIL)
+    return cnt;
+
+  words[cnt] = node->data;
+  index_len[cnt] = node->list->size;
+  indexes[cnt] = malloc(index_len[cnt]*sizeof(int));
+  convertToArr(node->list, indexes[cnt]);
+  cnt++;
+  if(node->left != KWNIL)
+    cnt = KWTree_populate_recursive2(words, indexes, index_len, node->left, cnt);
+  if(node->right != KWNIL)
+    cnt = KWTree_populate_recursive2(words, indexes, index_len, node->right, cnt);
+  return cnt;
+}
+void KWTree_populate_array(struct KWTree* tree, char** words, int** indexes, int* index_len) {
+  if(tree->size < 1) {
+    return;
+  }
+  int cnt = 0;
+  // cnt = KWTree_populate_recursive(words, indexes, index_len, tree->root, &cnt);
+  cnt = KWTree_populate_recursive2(words, indexes, index_len, tree->root, cnt);
+  printf("%d %d\n", tree->size, cnt);
+}
+
 void init_KWTree(struct KWTree* tree) {
   tree->root = malloc(sizeof(struct KWNode));
   tree->size = 0;

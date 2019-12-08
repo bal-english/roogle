@@ -10,13 +10,14 @@
 #include "../page/document.h"
 #include "../page/kwtree.h"
 #include "../page/ditree.h"
+#include "../page/construction.h"
 /*#include "../page/dictlist.h"
 #include "../page/document.h"
 #include "../page/ditree.h"
 #include "../page/kwtree.h"
 #include "../page/treeops.h"
 */
-
+/*
 int parse_into_KWTree(struct KWTree* tree, char* abstract, int index) {
   int start = 0; int next;
   int len = strlen(abstract);
@@ -52,6 +53,7 @@ int parse_into_KWTree(struct KWTree* tree, char* abstract, int index) {
   }
   // puts("Done.");
 }
+*/
 int main(int argc, char **argv){
 
   MPI_Init(NULL, NULL);
@@ -272,20 +274,6 @@ int main(int argc, char **argv){
   struct DITree ditree;
   define_DITree(&ditree);
 
-    //printf("%s\n", workspace+start);
-    // int i = 0;
-    // for(int index = start; index < newsize; ) {
-    //   printf("%d\n", index);
-    //   struct Document d;
-    //   index = process_to_doc(&d, workspace+index, newsize-index);
-    //   print_document(&d);
-    //   //puts("-------------");
-    //   DocIndex* d_ind;
-    //   create_DocIndex(&d_ind, d.id, rank*1000000+i);
-    //   i++;
-    //   parse_into_KWTree(ptr, d.abstract, d_ind->matrix_index);
-    //   //print_KWTree(ptr);
-    // }  int i = 0;
     int i = 0; int index;
     for(int index = start; index < newsize; ) {
       //printf("%d\n", start);

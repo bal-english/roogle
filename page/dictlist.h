@@ -47,15 +47,14 @@ void printlist(struct idList *list){
 
 int convertToArr(struct idList *list, int arr[]){
 
-  int index = 0;
+  int i;
   struct idNode *curr = list->first;
 
-  while(curr != NULL){
-    arr[index] = curr->index;
-    index++;
+  for(i = 0; i < list->size; i++) {
+    arr[i] = curr->index;
     curr = curr->next;
   }
-  return index;
+  return i;
 }
 
 void freelist(struct idList *list){

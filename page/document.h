@@ -69,6 +69,11 @@ void create_document(struct Document* d,
 int process_to_doc(struct Document* d, char* input, int len) {
   int cnt = 0;
   char* info[4];
+  if(input[0] == '\n') {
+    puts("--------");
+    print_document(d);
+    puts("--------");
+  }
   assert(input[0] != '\n');
   int last = 0; int next;
   //printf("%s\n", input);

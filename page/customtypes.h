@@ -18,6 +18,7 @@ int define_custom_document() {
   MPI_Type_commit(&MPI_DOC);
   return ret;
 }
+
 void define_custom_types() {
   define_custom_document();
 }
