@@ -96,9 +96,9 @@ void print_subKWTree_colors_recursive(struct KWNode* n, int level) {
 void print_subKWTree_values_recursive(struct KWNode* n, int level) {
   if(n == KWNIL)
     return;
-  print_subKWTree_values_recursive(n->right, level+1);
-  printf("%s, ", n->data);
   print_subKWTree_values_recursive(n->left, level+1);
+  printf("%s, ", n->data);
+  print_subKWTree_values_recursive(n->right, level+1);
 
 }
 void print_subKWTree_colors(struct KWNode* n) {
@@ -326,8 +326,8 @@ struct KWNode* KWTree_insert_kw(struct KWTree* tree, char* str) {
       } else
         current = current->right;
     } else {
-      if(debug)
-        printf("WARN: KWTree Insertion Failed, \"%s\" already exists.\n", str);
+      //if(debug)
+      //  printf("WARN: KWTree Insertion Failed, \"%s\" already exists.\n", str);
       free(newptr);
       return current;
     }
@@ -343,10 +343,10 @@ struct KWNode* KWTree_insert_kw(struct KWTree* tree, char* str) {
 }
 struct KWNode* KWTree_insert(struct KWTree* tree, char* keyword, int index) {
   struct KWNode* kw_ptr = KWTree_insert_kw(tree, keyword);
-  //appendtolist(kw_ptr->list, index);
+  appendtolist(kw_ptr->list, index);
   return kw_ptr;
 }
-void KWTree_fetch_idList(struct KWTree* tree, char* query, struct idList** buffer) {
+bool KWTree_fetch_idList(struct KWTree* tree, char* query, struct idList** buffer) {
   //assert(tree->root != KWNIL);
   struct KWNode* current = KWNIL;
   struct KWNode* next = tree->root;
@@ -355,15 +355,16 @@ void KWTree_fetch_idList(struct KWTree* tree, char* query, struct idList** buffe
     int cmp = strcmp(query, current->data);
     if(cmp == 0) {
       *buffer = (current->list);
-      return;
+      return true;
     } else if(cmp < 0) {
       next = next->left;
     } else
       next = next->right;
   } while(next != KWNIL);
-  if(debug) {
-    printf("Query: \"%s\" not found in KWTree.", query);
-  }
+  //if(debug) {
+  //  printf("Query: \"%s\" not found in KWTree.\n", query);
+  //}
+  return false;
 }
 
 // struct KWTree kwt;

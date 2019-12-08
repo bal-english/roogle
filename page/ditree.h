@@ -35,7 +35,7 @@ void create_DINode_def(struct DINode* n, DocIndex* di) {
 }
 
 int DINodecmp(struct DINode* n1, struct DINode* n2) {
-  return strcmp(n1->data->doc_id, n2->data->doc_id);
+  return strcmp(n1->data->doc->id, n2->data->doc->id);
 }
 
 bool DINode_append_left(struct DINode* p, struct DINode* l) {
@@ -78,9 +78,9 @@ void print_subDITree_colors_recursive(struct DINode* n, int level) {
   DI_print_spaces(level);
   if(n->is_red)
     //printf("R");
-    printf("%s", n->data->doc_id);
+    printf("%s", n->data->doc->id);
   else
-    printf("%s", n->data->doc_id);
+    printf("%s", n->data->doc->id);
     //printf("B");
   puts("");
   print_subDITree_colors_recursive(n->left, level+1);
@@ -114,14 +114,14 @@ void print_DITree_debug(struct DITree* tree) {
   }
   //printf("Tree | Size: %d, Longest Len: %d\n", tree->size, tree->longest_word);
   printf("Root: "); if(tree->root->is_red) printf("R"); else printf("B");
-  printf("-%s\n", tree->root->data->doc_id);
+  printf("-%s\n", tree->root->data->doc->id);
   printf("\tLC: ");
   if(tree->root->left != DINIL) {
     if(tree->root->left->is_red)
       printf("R");
     else
       printf("B");
-    printf("-%s\n", tree->root->left->data->doc_id);
+    printf("-%s\n", tree->root->left->data->doc->id);
   } else {
     puts("E");
   }
@@ -132,7 +132,7 @@ void print_DITree_debug(struct DITree* tree) {
       printf("R");
     else
       printf("B");
-    printf("-%s\n", tree->root->left->left->data->doc_id);
+    printf("-%s\n", tree->root->left->left->data->doc->id);
   } else {
     puts("E");
   }
@@ -143,7 +143,7 @@ void print_DITree_debug(struct DITree* tree) {
       printf("R");
     else
       printf("B");
-    printf("-%s\n", tree->root->left->right->data->doc_id);
+    printf("-%s\n", tree->root->left->right->data->doc->id);
   } else {
     puts("E");
   }
@@ -151,7 +151,7 @@ void print_DITree_debug(struct DITree* tree) {
   printf("\tRC: ");
   if(tree->root->right != DINIL) {
     if(tree->root->right->is_red) printf("R"); else printf("B");
-    printf("-%s\n", tree->root->right->data->doc_id);
+    printf("-%s\n", tree->root->right->data->doc->id);
   } else
     puts("E");
 }
@@ -270,7 +270,7 @@ void DITree_insert_di(struct DITree* tree, DocIndex* di) {
         current = current->right;
     } else {
       if(debug) {
-        printf("WARN: DITree Insertion Failed, {%s,%d} already exists.\n", di->doc_id, di->matrix_index);
+        printf("WARN: DITree Insertion Failed, {%s,%d} already exists.\n", di->doc->id, di->matrix_index);
       }
       free(newptr);
       return;
@@ -288,7 +288,7 @@ int DITree_get_index(struct DITree*, char* query) {
   }
   struct DINode* last = NIL;
   struct DINode* current = tree->root;
-  bool loop = true;//current != DINIL; || strcmp(current->data->doc_id, query) != 0;
+  bool loop = true;//current != DINIL; || strcmp(current->data->doc->id, query) != 0;
   while(loop) {
     int cmp = strcmp(tree->data->doc, query);
     if(cmp != 0) {
@@ -300,7 +300,7 @@ int DITree_get_index(struct DITree*, char* query) {
       }
       loop = current != NIL;
     } else {
-      return current->data->doc_id;
+      return current->data->matrix_index;
     }
   }
   return -1;

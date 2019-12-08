@@ -85,15 +85,16 @@ int process_to_doc(struct Document* d, char* input, int len) {
 
 typedef struct DocIndex {
   char* doc_id;
+  struct Document* doc;
   int matrix_index;
 } DocIndex;
 
 void print_DocIndex(const DocIndex* di) {
-  printf("%s: %d\n", di->doc_id, di->matrix_index);
+  printf("%s: %d\n", di->doc->->id, di->matrix_index);
 }
-void create_DocIndex(DocIndex** ptr, char* id, int index) {
+void create_DocIndex(DocIndex** ptr, struct Document* d, int index) {
   *ptr = malloc(sizeof(DocIndex));
   (*ptr)->matrix_index = index;
-  (*ptr)->doc_id = id;
+  (*ptr)->doc = d;
 }
 #endif
