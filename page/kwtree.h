@@ -5,6 +5,7 @@
 #include <string.h>
 #include "debug.h"
 #include "dictlist.h"
+
 #ifndef KWNODE
 #define KWNODE
 

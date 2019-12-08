@@ -9,6 +9,7 @@
 #include "../page/debug.h"
 #include "../page/document.h"
 #include "../page/kwtree.h"
+#include "../page/ditree.h"
 /*#include "../page/dictlist.h"
 #include "../page/document.h"
 #include "../page/ditree.h"
@@ -31,7 +32,7 @@ int parse_into_KWTree(struct KWTree* tree, char* abstract, int index) {
         //char* word[wordlen];
         char* word = malloc(wordlen*sizeof(char));
         memcpy(word, abstract+start, wordlen);
-        word[wordlen] = '\0';
+        //word[wordlen] = '\0';
         if(strcmp(word, "with") != 0 && strcmp(word, "which") != 0 && strcmp(word, "well") != 0 && strcmp(word, "that") != 0 && strcmp(word, "such") != 0 && strcmp(word, "from") != 0) {
           // printf("%s %d %d\n", word, start, next);
           // for(int i = 0; i < strlen(word); i++) {
@@ -67,7 +68,7 @@ int main(int argc, char **argv){
   //if(argc > 1 && strcmp(argv[1],"-d") == 0)
   //  debug = true;
 
-  const char* meta_path = "../data/examples/shortmeta-mod.txt";
+  const char* meta_path = "../data/examples/longermeta-mod.txt";
   MPI_File meta_file;
 
   int missing = MPI_File_open(world, meta_path, MPI_MODE_RDONLY, MPI_INFO_NULL, &meta_file);
@@ -92,9 +93,11 @@ int main(int argc, char **argv){
   MPI_File_seek(meta_file, rank*mincharload, MPI_SEEK_SET);
 
   char* readinput = malloc(localcharload*sizeof(char));
-  MPI_File_read(meta_file, readinput+subrank*mincharload, localcharload, MPI_CHAR, MPI_STATUS_IGNORE);
+  MPI_File_read(meta_file, readinput/*+subrank*mincharload*/, localcharload, MPI_CHAR, MPI_STATUS_IGNORE);
   //printf("(%d) %s\n\n", rank, readinput);
-
+  MPI_Barrier(world);
+  if(debug && rank == 0)
+    puts("Meta Data File Read Finished.");
   MPI_Barrier(world);
 /*  bool keep = true;
   bool need_recv = false;
@@ -193,6 +196,7 @@ int main(int argc, char **argv){
   }
   //printf("(%d) %d\n", rank, ln_cnt);
   assert(ln_cnt >= 6);
+
   if(ln_cnt >= 6) {
     int pi1 = -1; bool p1found = false;
     int pi2 = -1; bool p2found = false;
@@ -227,6 +231,8 @@ int main(int argc, char **argv){
 
   }
 
+  MPI_Barrier(world);
+
   if(debug)
   printf("(%d) KEEP: %d, RECV: %d, SEND: %d, PART: %d, FULL: %d\n", rank, keep, need_recv, need_send, send_part, send_full);
 
@@ -239,28 +245,33 @@ int main(int argc, char **argv){
 
   int newsize;
   char* workspace;
+  MPI_Barrier(world);
   if(need_recv) {
     int rsize;
-    MPI_Recv(&rsize, 1, MPI_INT, rank+1, (rank)*10, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv(&rsize, 1, MPI_INT, rank+1, (rank)*100, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     workspace = malloc((localcharload+rsize)*sizeof(char));
     memcpy(workspace, readinput, localcharload);
     //char* test = malloc(rsize*sizeof(char));
-    newsize = mincharload+rsize;
-    MPI_Recv(workspace+localcharload, rsize, MPI_CHAR, rank+1, rank*10+1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    newsize = localcharload+rsize;
+    MPI_Recv(workspace+localcharload, rsize, MPI_CHAR, rank+1, rank*100+1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     //printf("%s\n", test);
   } else {
     workspace = readinput;
     newsize = mincharload;
   }
+  if(rank == 2)
+    puts("Hello.");
   if(need_send) {
     int ssize = start;
-    MPI_Send(&ssize, 1, MPI_INT, rank-1, (rank-1)*10, MPI_COMM_WORLD);
-    MPI_Send(workspace, ssize, MPI_CHAR, rank-1, (rank-1)*10+1, MPI_COMM_WORLD);
+    MPI_Send(&ssize, 1, MPI_INT, rank-1, (rank-1)*100, MPI_COMM_WORLD);
+    MPI_Send(workspace, ssize, MPI_CHAR, rank-1, (rank-1)*100+1, MPI_COMM_WORLD);
   }
-  struct KWTree tree;
-  struct KWTree* ptr = &tree;
-  define_KWTree(ptr);
-  
+  MPI_Barrier(world);
+  struct KWTree kwtree;
+  define_KWTree(&kwtree);
+  struct DITree ditree;
+  define_DITree(&ditree);
+
     //printf("%s\n", workspace+start);
     // int i = 0;
     // for(int index = start; index < newsize; ) {
@@ -278,19 +289,38 @@ int main(int argc, char **argv){
     int i = 0; int index;
     for(int index = start; index < newsize; ) {
       //printf("%d\n", start);
-      struct Document d;
-      index += process_to_doc(&d, workspace+index, newsize-index);
+      struct Document* d = malloc(sizeof(struct Document));
+      index += process_to_doc(d, workspace+index, newsize-index);
       //printf("%d\n", index);
-      print_document(&d);
+      //print_document(&d);
       //puts("-------------");
-      DocIndex* d_ind;
-      create_DocIndex(&d_ind, d.id, rank*1000000+i);
+      DocIndex* d_ind = DITree_insert(&ditree, d, i);
+      //create_DocIndex(&d_ind, &d, rank*1000000+i);
       i++;
-      parse_into_KWTree(ptr, d.abstract, d_ind->matrix_index);
+      //DITree_insert_di(&ditree, d_ind);
+      parse_into_KWTree(&kwtree, d->abstract, d_ind->matrix_index);
       //puts("");
     }
-    print_KWTree_elements(ptr);
+    for(int i = 0; i < worldsize; i++) {
+      if(rank == i) {
+        print_KWTree_elements(&kwtree);
+      }
+      MPI_Barrier(world);
+      if(rank == i) {
+        print_DITree_elements(&ditree);
+      }
+      MPI_Barrier(world);
+    }
 
+    MPI_Barrier(world);
+    struct idList* list;
+    char* query = "these";
+    bool found = KWTree_fetch_idList(&kwtree, query, &list);
+    MPI_Barrier(world);
+    if(found) {
+      puts("\n");
+      printlist(list);
+    }
 
 
 

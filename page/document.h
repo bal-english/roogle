@@ -3,12 +3,18 @@
 
 #ifndef DOCUMENT
 #define DOCUMENT
+
+#define MAXDOCIDLEN 40
+#define MAXDOCTITLELEN 300
+#define MAXDOCAUTHORSLEN 200
+#define MAXDOCABSTRACTLEN 2000
+
 struct Document {
-  char* id;
-  char* title;
-  char* authors;
-  int authornum;
-  char* abstract;
+  char id[MAXDOCIDLEN];
+  char title[MAXDOCTITLELEN];
+  char authors[MAXDOCAUTHORSLEN];
+  char abstract[MAXDOCABSTRACTLEN];
+  //int authornum;
 
   int matrixindex;
   float hubscore;
@@ -25,11 +31,16 @@ void create_new_document(struct Document* d,
                     char* _authors,
                     //int _authornum,
                     char* _abstract) {
-  d->id = _id;
-  d->title = _title;
-  d->authors = _authors;
+  assert(strlen(_id) < 41);
+  // d->id = _id;
+  strcpy(d->id, _id);
+  // d->title = _title;
+  strcpy(d->title, _title);
+  // d->authors = _authors;
+  strcpy(d->authors, _authors);
   //d->authornum = _authornum;
-  d->abstract = _abstract;
+  // d->abstract = _abstract;
+  strcpy(d->abstract, _abstract);
 }
 void set_document_values(struct Document* d,
                     int matrixindex,
@@ -90,7 +101,7 @@ typedef struct DocIndex {
 } DocIndex;
 
 void print_DocIndex(const DocIndex* di) {
-  printf("%s: %d\n", di->doc->->id, di->matrix_index);
+  printf("%s: %d\n", di->doc->id, di->matrix_index);
 }
 void create_DocIndex(DocIndex** ptr, struct Document* d, int index) {
   *ptr = malloc(sizeof(DocIndex));

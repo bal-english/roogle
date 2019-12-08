@@ -7,12 +7,14 @@ struct idNode {
 struct idList {
   struct idNode *first;
   struct idNode *last;
+  int size;
 };
 
 void initlist(struct idList *list){
   //list = (struct idList*)malloc(sizeof (struct idList));
   list->first = NULL;
   list->last = NULL;
+  list->size = 0;
 }
 
 void appendtolist(struct idList *list, int index){
@@ -24,12 +26,14 @@ void appendtolist(struct idList *list, int index){
     list->first = (struct idNode*)malloc(sizeof (struct idNode));
     list->first->index = index;
     list->last = list->first;
+    list->size++;
     return;
   }
   //append to last node
   list->last->next = (struct idNode*)malloc(sizeof (struct idNode));
   list->last->next->index = index;
   list->last = list->last->next;
+  list->size++;
 }
 
 void printlist(struct idList *list){
