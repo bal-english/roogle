@@ -171,6 +171,27 @@ void print_DITree_debug(struct DITree* tree) {
   } else
     puts("E");
 }
+int DITree_populate_recursive2(struct Document* docs, int* indexes, struct DINode* node, int cnt) {
+  if(node == DINIL) {
+    return cnt;
+  }
+
+  docs[cnt] = *(node->data->doc);
+  indexes[cnt] = node->data->matrix_index;
+  cnt++;
+  if(node->left != DINIL)
+    cnt = DITree_populate_recursive2(docs, indexes, node->left, cnt);
+  if(node->right != DINIL)
+    cnt = DITree_populate_recursive2(docs, indexes, node->right, cnt);
+  return cnt;
+}
+void DITree_populate_array(struct DITree* tree, struct Document* docs, int* indexes) {
+  if(tree->size < 1) {
+    return;
+  }
+  int cnt = 0;
+  cnt = DITree_populate_recursive2(docs, indexes, tree->root, cnt);
+}
 void init_DITree(struct DITree* tree) {
   tree->root = malloc(sizeof(struct DINode));
   tree->size = 0;
@@ -303,6 +324,11 @@ void DITree_insert_di(struct DITree* tree, DocIndex* di) {
   newptr->is_red = true;
   DITree_color_fix(tree, newptr);
 }
+DocIndex* DITree_insert(struct DITree* tree, struct Document* d, int index) {
+  DocIndex* di; create_DocIndex(&di, d, index);
+  DITree_insert_di(tree, di);
+  return di;
+}
 int DITree_get_index(struct DITree* tree, char* query) {
   if(tree->root == DINIL || tree->size == 0) {
     return -1;
@@ -325,11 +351,6 @@ int DITree_get_index(struct DITree* tree, char* query) {
     }
   }
   return -1;
-}
-DocIndex* DITree_insert(struct DITree* tree, struct Document* d, int index) {
-  DocIndex* di; create_DocIndex(&di, d, index);
-  DITree_insert_di(tree, di);
-  return di;
 }
 
 #endif

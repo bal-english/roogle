@@ -221,7 +221,7 @@ void KWTree_populate_array(struct KWTree* tree, char** words, int** indexes, int
     return;
   }
   int cnt = 0;
-  // cnt = KWTree_populate_recursive(words, indexes, index_len, tree->root, &cnt);
+  //cnt = KWTree_populate_recursive(words, indexes, index_len, tree->root, &cnt);
   cnt = KWTree_populate_recursive2(words, indexes, index_len, tree->root, cnt);
   printf("%d %d\n", tree->size, cnt);
 }
@@ -343,6 +343,7 @@ struct KWNode* KWTree_insert_kw(struct KWTree* tree, char* str) {
     return tree->root;
   }
   struct KWNode* newptr = malloc(sizeof(struct KWNode));
+  //printf("%s\n", str);
   create_KWNode_def(newptr, str);
   struct KWNode* current = tree->root;
 
@@ -368,6 +369,7 @@ struct KWNode* KWTree_insert_kw(struct KWTree* tree, char* str) {
       //if(debug)
       //  printf("WARN: KWTree Insertion Failed, \"%s\" already exists.\n", str);
       free(newptr);
+      //puts("Returning!");
       return current;
     }
     if(loop)
@@ -385,6 +387,14 @@ struct KWNode* KWTree_insert(struct KWTree* tree, char* keyword, int index) {
   appendtolist(kw_ptr->list, index);
   return kw_ptr;
 }
+
+void KWTree_af(struct KWTree* tree, char** keyword, struct idList* list, int delta) {
+  assert(tree->root != KWNIL);
+  shift_list_indicies(list, delta);
+  struct KWNode* kw_ptr = KWTree_insert_kw(tree, *keyword);
+  append_sublist(kw_ptr->list, list);
+}
+
 bool KWTree_fetch_idList(struct KWTree* tree, char* query, struct idList** buffer) {
   //assert(tree->root != KWNIL);
   struct KWNode* current = KWNIL;

@@ -12,10 +12,12 @@
 #include "page/ditree.h"
 #include "page/construction.h"
 #include "page/procio.h"
+#include "page/customtypes.h"
 int main(int argc, char **argv){
   time_t t = time(0);
 
   MPI_Init(NULL, NULL);
+  define_custom_types();
   int worldsize;
   MPI_Comm world, sub;
   world = MPI_COMM_WORLD;
@@ -98,7 +100,6 @@ int main(int argc, char **argv){
     if(readinput[a] == '\n')
       ln_cnt++;
   }
-  //printf("(%d) %d\n", rank, ln_cnt);
   assert(ln_cnt >= 6);
 
   if(ln_cnt >= 6) {
@@ -210,54 +211,56 @@ int main(int argc, char **argv){
   }*/
 
   MPI_Barrier(world);
-  struct idList* list;
-  char* query = "these";
-  bool found = KWTree_fetch_idList(&kwtree, query, &list);
-  MPI_Barrier(world);
+  // struct idList* list;
+  // char* query = "these";
+  // bool found = KWTree_fetch_idList(&kwtree, query, &list);
+  // MPI_Barrier(world);
   /*if(found) {
     puts("\n");
     printlist(list);
   }*/
-  char* words[kwtree.size];
-  int* indexes[kwtree.size];
-  int lengths[kwtree.size];
-  printf("%d\n", kwtree.size);
-  KWTree_populate_array(&kwtree, words, indexes, lengths);
-  // if(rank == 1) {
-  //   for(int i = 0; i < kwtree.size; i++) {
-  //     printf("%d %s\n", i, words[i]);
-  //   }
-  // }
-  MPI_Barrier(world);
-  // printf("(%d) %s, %s, %s, %s\n", rank, words[0], words[kwtree.size/3], words[kwtree.size*2/3], words[kwtree.size-1]);
 
   assert(worldsize == 2);
-  int looplen = 140;
   if(rank == 1) {
-    //printf("s: %d\n", kwtree.size);
-    //flogf("%d\n", kwtree.size);
+    char* words[kwtree.size];
+    int* kwindexes[kwtree.size];
+    int lengths[kwtree.size];
+    KWTree_populate_array(&kwtree, words, kwindexes, lengths);
+
+    struct Document docs[ditree.size];
+    int diindexes[ditree.size];
+    DITree_populate_array(&ditree, docs, diindexes);
+
     MPI_Send(&(kwtree.size), 1, MPI_INT, 0, 0, world);
     MPI_Send(lengths, kwtree.size, MPI_INT, 0, 1, world);
-
-    for(int i = 0 ; i < kwtree.size; i++) {
+    int i;
+    for(i = 0 ; i < kwtree.size; i++) {
       int wordlen = strlen(words[i]);
       MPI_Send(&wordlen, 1, MPI_INT, 0, 2+i*3, world);
       MPI_Send(words[i], wordlen, MPI_CHAR, 0, 3+i*3, world);
       //if(i > 35)
       //  flogf("%s\n", words[i]);
-      MPI_Send(indexes[i], lengths[i], MPI_INT, 0, 4+i*3, world);
+      MPI_Send(kwindexes[i], lengths[i], MPI_INT, 0, 4+i*3, world);
     }
+
+    MPI_Send(&(ditree.size), 1, MPI_INT, 0, 5+i*3, world);
+    MPI_Send(docs, ditree.size, MPI_DOC, 0, 6+i*3, world);
+
   }
   if(rank == 0){
-    int recv_tree_size;
-    MPI_Recv(&recv_tree_size, 1, MPI_INT, 1, 0, world, MPI_STATUS_IGNORE);
+    //---------------------------------------------
+    // Recv Info From Other Nodes
+    //---------------------------------------------
+    int recv_kwtree_size;
+    MPI_Recv(&recv_kwtree_size, 1, MPI_INT, 1, 0, world, MPI_STATUS_IGNORE);
 
-    int* recv_tree_list_lens = malloc(recv_tree_size*sizeof(int));
-    MPI_Recv(recv_tree_list_lens, recv_tree_size, MPI_INT, 1, 1, world, MPI_STATUS_IGNORE);
+    int* recv_tree_list_lens = malloc(recv_kwtree_size*sizeof(int));
+    MPI_Recv(recv_tree_list_lens, recv_kwtree_size, MPI_INT, 1, 1, world, MPI_STATUS_IGNORE);
 
-    char* recv_words[recv_tree_size];
-    int* recv_indexes[recv_tree_size];
-    for(int i = 0; i < recv_tree_size; i++) {
+    char* recv_words[recv_kwtree_size];
+    int* recv_indexes[recv_kwtree_size];
+    int i;
+    for(i = 0; i < recv_kwtree_size; i++) {
       int wordlen;
       MPI_Recv(&wordlen, 1, MPI_INT, 1, 2+i*3, world, MPI_STATUS_IGNORE);
       recv_words[i] = malloc(wordlen*sizeof(char));
@@ -266,12 +269,45 @@ int main(int argc, char **argv){
       recv_indexes[i] = malloc(recv_tree_list_lens[i]*sizeof(int));
       MPI_Recv(recv_indexes[i], recv_tree_list_lens[i], MPI_INT, 1, 4+i*3, world, MPI_STATUS_IGNORE);
     }
-    printf("(%d) %s, %s, %s, %s, %s\n", rank, recv_words[0], recv_words[looplen-1], recv_words[recv_tree_size/3], recv_words[recv_tree_size*2/3], recv_words[recv_tree_size-1]);
+    //printf("(%d) %s, %s, %s, %s, %s\n", rank, recv_words[0], recv_words[/*looplen-*/1], recv_words[recv_kwtree_size/3], recv_words[recv_kwtree_size*2/3], recv_words[recv_kwtree_size-1]);
+
+    int recv_ditree_size;
+    MPI_Recv(&recv_ditree_size, 1, MPI_INT, 1, 5+i*3, world, MPI_STATUS_IGNORE);
+
+    struct Document recv_docs[recv_ditree_size];
+    MPI_Recv(recv_docs, recv_ditree_size, MPI_DOC, 1, 6+i*3, world, MPI_STATUS_IGNORE);
+    //---------------------------------------------
+
+    int old_ditree_size = ditree.size;
+    //---------------------------------------------
+    // Add to Local KWTree
+    //---------------------------------------------
+    for(int j = 0; j < recv_kwtree_size; j++) {
+      struct idList* list = malloc(sizeof(struct idList));
+      create_from_array(list, recv_indexes[j], recv_tree_list_lens[j]);
+      char* word = recv_words[j];
+      KWTree_af(&kwtree, &word, list, old_ditree_size);
+    }
+    flog_KWTree(&kwtree);
+
+    //---------------------------------------------
+    // Add to Local DITree
+    //---------------------------------------------
+    int from_node = 1;
+    for(int j = 0; j < recv_ditree_size; j++) {
+      DITree_insert(&ditree, &(recv_docs[j]), ditree.size);
+    }
+    flog_DITree(&ditree);
+
+    //---------------------------------------------
+    // Calculations
+    //---------------------------------------------
   }
   MPI_Barrier(world);
 
 
-  puts("Done.");
+  printf("(%d) Done.\n", rank);
+  flogf("(%d) Done.\n", rank);
 
   fclose(locallog);
   MPI_Finalize();

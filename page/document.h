@@ -66,17 +66,16 @@ void create_document(struct Document* d,
   create_new_document(d, _id, _title, _authors, /*_authornum,*/ _abstract);
   set_document_values(d, matrixindex, hs, as, pr);
 }
+#include <mpi.h>
 int process_to_doc(struct Document* d, char* input, int len) {
   int cnt = 0;
   char* info[4];
-  if(input[0] == '\n') {
-    puts("--------");
-    print_document(d);
-    puts("--------");
-  }
+
   assert(input[0] != '\n');
   int last = 0; int next;
   //printf("%s\n", input);
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   for(next = last+1; next < len && cnt < 4; next++) {
     if(input[next] == '\n' || input[next] == '\0') {
       info[cnt] = malloc((next-last)*sizeof(char));

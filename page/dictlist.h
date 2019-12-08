@@ -35,6 +35,35 @@ void appendtolist(struct idList *list, int index){
   list->last = list->last->next;
   list->size++;
 }
+void append_sublist(struct idList* parent, struct idList* child) {
+  if(child == NULL)
+    return;
+  if(parent == NULL || parent->size == 0) {
+    parent->first = child->first;
+    parent->last = child->last;
+    parent->size = child->size;
+    return;
+  }
+  // printf("%d", parent->last->next == NULL);
+  // for(int i = 0 ; i < child->size; i++) {
+  //   appendtolist(parent, -1);
+  // }
+
+  //parent->last->next = (struct idNode*) malloc(sizeof(struct idNode));
+  // printf("%d\n", parent->size);
+  // printf("hello: %d \n", parent->last == NULL);
+
+  parent->last->next = child->first;
+  parent->last = child->last;
+  parent->size += child->size;
+}
+
+void create_from_array(struct idList* list, int* arr, int n) {
+  initlist(list);
+  for(int i = 0; i < n; i++) {
+    appendtolist(list, arr[i]);
+  }
+}
 
 void printlist(struct idList *list){
   struct idNode *curr = list->first;
@@ -57,6 +86,13 @@ int convertToArr(struct idList *list, int arr[]){
   return i;
 }
 
+void shift_list_indicies(struct idList* list, const int delta) {
+  struct idNode* curr = list->first;
+  for(int i = 0; i < list->size; i++) {
+    curr->index += delta;
+    curr = curr->next;
+  }
+}
 void freelist(struct idList *list){
   struct idNode *curr = list->first;
   while(curr != NULL){
