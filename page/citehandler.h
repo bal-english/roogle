@@ -1,4 +1,5 @@
-
+#include <stdio.h>
+#include <fcntl.h>
 struct Citenode {
   int index;
   struct Citenode *next;
@@ -20,6 +21,10 @@ void printcitelink(int origin, struct Citenode *cl){
 void buildCiteList(struct DITree* dt, char *origin, char **citations, int nc, struct Citenode* citearray[]){
 
   int originIndex = DITree_get_index(dt, origin);
+  if(originIndex == -1) {
+    printf("%s not found in tree\n", origin);
+    return;
+  }
   struct Citenode *start = (struct Citenode*)malloc(sizeof (struct Citenode));
   start->next = NULL;
   struct Citenode *curr = start;
@@ -30,6 +35,10 @@ void buildCiteList(struct DITree* dt, char *origin, char **citations, int nc, st
   for(i = 1; i < nc; i++){
 
     int currindex = DITree_get_index(dt, citations[i]);
+    if(currindex == -1) {
+      continue;
+
+    }
     curr->next = (struct Citenode*)malloc(sizeof (struct Citenode)); //make a new one after it
     curr = curr->next;
     curr->index = currindex;
@@ -122,7 +131,7 @@ void printcitelist(char *list[], int numcites){
 
 //TESTING//////////////////////////
 
-
+/*
 void arbitraryInsert(struct DITree *dt, char *id, int index){
 
   if(DITree_get_index(dt, id) == -1){
@@ -134,7 +143,7 @@ void arbitraryInsert(struct DITree *dt, char *id, int index){
   }
 
 }
-
+*/
 
 int paperdelim(char *line){
   if(strcmp(line, "+++++") == 0){
@@ -150,7 +159,7 @@ int citedelim(char *line){
   return 0;
 }
 
-
+/*
 void setArbitraryIndices(char **allcontent, int numcites, struct DITree* dt){
 
   int i;
@@ -170,7 +179,7 @@ void setArbitraryIndices(char **allcontent, int numcites, struct DITree* dt){
   }
 
 }
-
+*/
 ////////////////////////////
 
 //convert linked list of cites to an array of cite strings
@@ -286,7 +295,7 @@ int readfile(char *filename, struct DITree* dt, struct Citenode *citationlist[],
   //printf("finished reading %d lines, formatting...\n", currcite);
 
   //if dt is not already set, this will set indices arbitrarily
-  setArbitraryIndices(allcites, currcite, dt);
+  //setArbitraryIndices(allcites, currcite, dt);
 
   return processCites(allcites, currcite, dt, citationlist);
 
@@ -303,7 +312,7 @@ void buildCSRfromCiteFile(struct CSRgraph *csr, struct DITree* dt, char *file){
 
   int vertexcount = readfile(file, dt, citationlist, linecount);
   //debugprintCitelist(citationlist, vertexcount);
-
+  puts("Test2.");
   buildCSRfromCitearr(csr, citationlist, vertexcount);
 
 }

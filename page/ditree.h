@@ -337,7 +337,7 @@ int DITree_get_index(struct DITree* tree, char* query) {
   struct DINode* current = tree->root;
   bool loop = true;//current != DINIL; || strcmp(current->data->doc->id, query) != 0;
   while(loop) {
-    int cmp = strcmp(current->data->doc->id, query);
+    int cmp = strcmp(query, current->data->doc->id);
     if(cmp != 0) {
       last = current;
       if(cmp < 0) {

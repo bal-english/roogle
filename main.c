@@ -6,6 +6,12 @@
 #include <string.h>
 #include <mpi.h>
 #include <assert.h>
+
+#include <unistd.h>
+#include <fcntl.h>
+
+
+
 #include "page/debug.h"
 #include "page/document.h"
 #include "page/kwtree.h"
@@ -13,6 +19,10 @@
 #include "page/construction.h"
 #include "page/procio.h"
 #include "page/customtypes.h"
+#include "page/csr.h"
+#include "page/graph.h"
+#include "page/citehandler.h"
+
 int main(int argc, char **argv){
   time_t t = time(0);
 
@@ -45,7 +55,7 @@ int main(int argc, char **argv){
     setup_procio(t);
     flogf("Processor Rank: %d\n\n", rank);
 
-  const char* meta_path = "data/examples/longermeta-mod.txt";
+  const char* meta_path = "data/examples/medmeta-mod.txt";
   MPI_File meta_file;
 
   int missing = MPI_File_open(world, meta_path, MPI_MODE_RDONLY, MPI_INFO_NULL, &meta_file);
@@ -297,11 +307,32 @@ int main(int argc, char **argv){
     for(int j = 0; j < recv_ditree_size; j++) {
       DITree_insert(&ditree, &(recv_docs[j]), ditree.size);
     }
+    print_DITree_elements(&ditree);
     flog_DITree(&ditree);
 
     //---------------------------------------------
     // Calculations
     //---------------------------------------------
+
+    //define graph
+    struct CSRgraph graph;
+    struct CSRgraph *csr = &graph;
+
+    buildCSRfromCiteFile(csr, &ditree, "data/examples/testcitations");//"data/arxiv-citations.txt"); //<-- pass CSRgraph, DItree, and name of citations file
+
+    statprint(*csr); //<-- prints graph stats, optional
+
+    //calc hub, auth, and pagerank
+
+    int hub[csr->nvertices], auth[csr->nvertices];
+    float pagerank[csr->nvertices];
+
+    sparsehub(*csr, hub, csr->nvertices);
+    sparseauth(*csr, auth, hub, csr->nvertices);
+    sparsepagerank(*csr, pagerank);
+
+    for (int k = 0; k < ditree.size; k++)
+      printf("%d %d %0.4f\n", hub[k], auth[k], pagerank[k]) ;
   }
   MPI_Barrier(world);
 

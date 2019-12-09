@@ -359,6 +359,8 @@ void sparsehub(struct CSRgraph csr, int hub[], int n){
     hub[i] = 0;
   }
 
+  if(csr.nedges == 0) return;
+
   sparsemult(csr, vector, hub, n); //get hub score
 
 }
@@ -370,6 +372,7 @@ void sparseauth(struct CSRgraph csr, int auth[], int hub[], int n){
     auth[i] = 0;
   }
 
+  if(csr.nedges == 0) return;
   for(i = 0; i < csr.nvertices; i++){
 
     int lowerBound = csr.dest_offsets[i];
@@ -395,6 +398,7 @@ void sparsepagerank(struct CSRgraph csr, float res[]){
 
   int n = csr.nvertices;
 
+  if(csr.nedges == 0) return;
   float vector[n];
   int i;
 
@@ -424,7 +428,7 @@ void sparsepagerank(struct CSRgraph csr, float res[]){
   }
 
 }
-
+/*
 int shortestpath(int start, int target, struct CSRgraph *csr){
 
   int dist = searchVertex(start, target, csr);
@@ -456,3 +460,4 @@ int searchVertex(int start, int target, struct CSRgraph *csr){
   //return csr->nvertices;
 
 }
+*/
