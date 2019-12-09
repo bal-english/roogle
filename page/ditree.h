@@ -185,12 +185,29 @@ int DITree_populate_recursive2(struct Document* docs, int* indexes, struct DINod
     cnt = DITree_populate_recursive2(docs, indexes, node->right, cnt);
   return cnt;
 }
+void DITree_convert_recursive(struct Document* docs, struct DINode* node) {
+  if(node == DINIL) {
+    return;
+  }
+
+  docs[node->data->matrix_index] = *(node->data->doc);
+  DITree_convert_recursive(docs, node->left);
+  DITree_convert_recursive(docs, node->right);
+}
+
 void DITree_populate_array(struct DITree* tree, struct Document* docs, int* indexes) {
   if(tree->size < 1) {
     return;
   }
   int cnt = 0;
   cnt = DITree_populate_recursive2(docs, indexes, tree->root, cnt);
+}
+
+void DITree_convert_to_array(struct DITree* tree, struct Document* doc_arr) {
+  if(tree->size < 1) {
+    return;
+  }
+  DITree_convert_recursive(doc_arr, tree->root);
 }
 void init_DITree(struct DITree* tree) {
   tree->root = malloc(sizeof(struct DINode));

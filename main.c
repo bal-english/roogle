@@ -309,6 +309,12 @@ int main(int argc, char **argv){
       print_DITree_elements(&ditree);
     flog_DITree(&ditree);
 
+    struct Document doc_arr[ditree.size];
+    DITree_convert_to_array(&ditree, doc_arr);
+    // for(int i = 0; i < ditree.size; i++) {
+    //   printf("%s\n", doc_arr[i].id);
+    // }
+
     //---------------------------------------------
     // Calculations
     //---------------------------------------------
