@@ -221,9 +221,7 @@ void KWTree_populate_array(struct KWTree* tree, char** words, int** indexes, int
     return;
   }
   int cnt = 0;
-  //cnt = KWTree_populate_recursive(words, indexes, index_len, tree->root, &cnt);
   cnt = KWTree_populate_recursive2(words, indexes, index_len, tree->root, cnt);
-  printf("%d %d\n", tree->size, cnt);
 }
 
 void init_KWTree(struct KWTree* tree) {

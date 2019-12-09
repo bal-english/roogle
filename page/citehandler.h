@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <fcntl.h>
+#include "debug.h"
 struct Citenode {
   int index;
   struct Citenode *next;
@@ -231,12 +232,13 @@ int processCites(char *allcontent[], long int numcites, struct DITree* dt, struc
     allcites++;
 
     //free malloc'd strings whle we're at it
-
+    if(debug)
     if(i % 200000 == 0) printf("processed citation %d...\n", i);
 
   }
 
-  printf("finished processing cites...\n");
+  if(debug)
+    printf("finished processing cites...\n");
 
   //the last one will never get hit since there is no +++++ to end file
   //just do it manually here
@@ -245,8 +247,8 @@ int processCites(char *allcontent[], long int numcites, struct DITree* dt, struc
 
   //lets also free everything in our curr buffer
   //(do this later)
-
-  printf("lines: %d citations: %d\n", numcites, allcites);
+  if(debug)
+    printf("lines: %d citations: %d\n", numcites, allcites);
   return allcites;
 
 }
@@ -312,7 +314,6 @@ void buildCSRfromCiteFile(struct CSRgraph *csr, struct DITree* dt, char *file){
 
   int vertexcount = readfile(file, dt, citationlist, linecount);
   //debugprintCitelist(citationlist, vertexcount);
-  puts("Test2.");
   buildCSRfromCitearr(csr, citationlist, vertexcount);
 
 }

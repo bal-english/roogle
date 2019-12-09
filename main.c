@@ -48,14 +48,12 @@ int main(int argc, char **argv){
       if(rank == 0)
         puts("Debug Mode: TRUE");
       remainingArgs--;
-    } else
-      if(rank == 0)
-        puts("Debug Mode: FALSE");
+    } else {}
 
     setup_procio(t);
     flogf("Processor Rank: %d\n\n", rank);
 
-  const char* meta_path = "data/examples/medmeta-mod.txt";
+  const char* meta_path = /*"data/arxiv-metadata.txt";*/"data/examples/submission/test-metadata.txt";
   MPI_File meta_file;
 
   int missing = MPI_File_open(world, meta_path, MPI_MODE_RDONLY, MPI_INFO_NULL, &meta_file);
@@ -131,8 +129,8 @@ int main(int argc, char **argv){
     assert(p2found);
     start = pi1+1;
     end = pi2+1;
-    printf("(%d) %d %d\n", rank, pi1, pi2);
-    printf("(%d) %d %d\n", rank, end, localcharload);
+    //printf("(%d) %d %d\n", rank, pi1, pi2);
+    //printf("(%d) %d %d\n", rank, end, localcharload);
     if(end != localcharload) {
       need_recv = true;
     }
@@ -307,7 +305,8 @@ int main(int argc, char **argv){
     for(int j = 0; j < recv_ditree_size; j++) {
       DITree_insert(&ditree, &(recv_docs[j]), ditree.size);
     }
-    print_DITree_elements(&ditree);
+    if(debug)
+      print_DITree_elements(&ditree);
     flog_DITree(&ditree);
 
     //---------------------------------------------
@@ -318,9 +317,10 @@ int main(int argc, char **argv){
     struct CSRgraph graph;
     struct CSRgraph *csr = &graph;
 
-    buildCSRfromCiteFile(csr, &ditree, "data/examples/testcitations");//"data/arxiv-citations.txt"); //<-- pass CSRgraph, DItree, and name of citations file
+    buildCSRfromCiteFile(csr, &ditree, /*"data/examples/testcitations");*/"data/examples/submission/test-citations.txt"); //<-- pass CSRgraph, DItree, and name of citations file
 
-    statprint(*csr); //<-- prints graph stats, optional
+    if(debug)
+      statprint(*csr); //<-- prints graph stats, optional
 
     //calc hub, auth, and pagerank
 
@@ -331,13 +331,15 @@ int main(int argc, char **argv){
     sparseauth(*csr, auth, hub, csr->nvertices);
     sparsepagerank(*csr, pagerank);
 
-    for (int k = 0; k < ditree.size; k++)
-      printf("%d %d %0.4f\n", hub[k], auth[k], pagerank[k]) ;
+    if(debug)
+      for (int k = 0; k < ditree.size; k++)
+        printf("%d %d %0.4f\n", hub[k], auth[k], pagerank[k]) ;
   }
   MPI_Barrier(world);
 
 
-  printf("(%d) Done.\n", rank);
+  if(debug)
+    printf("(%d) Done.\n", rank);
   flogf("(%d) Done.\n", rank);
 
   fclose(locallog);
